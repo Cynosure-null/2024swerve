@@ -1,0 +1,49 @@
+{
+  "NetworkTables": {
+    "retained": {
+      "limelight-dev": {
+        "open": true
+      }
+    },
+    "transitory": {
+      "FMSInfo": {
+        "open": true
+      },
+      "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "Talon FX (Pro) 30": {
+          "open": true
+        },
+        "Talon FX (Pro) 60": {
+          "open": true
+        },
+        "bl": {
+          "open": true
+        },
+        "br": {
+          "open": true
+        },
+        "fl": {
+          "open": true
+        },
+        "fr": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Auto Modes": "String Chooser",
+      "/SmartDashboard/Odometry Field": "Field2d",
+      "/SmartDashboard/Turn PID": "PIDController"
+    }
+  },
+  "NetworkTables Settings": {
+    "dsClient": false,
+    "mode": "Client (NT4)",
+    "serverTeam": "2240"
+  }
+}
