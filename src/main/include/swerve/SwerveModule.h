@@ -19,7 +19,7 @@ public:
     /*                  Public Function Declarations                  */
     /******************************************************************/
 
-    SwerveModule(int const &driver_adr, int const &turner_adr, int const &cancoder_adr, double const &magnet_offset);
+    SwerveModule(int const &driver_adr, int const &turner_adr, int const &cancoder_adr, units::angle::turn_t offset);
 
     [[nodiscard]] frc::SwerveModuleState getState();
 
@@ -44,6 +44,10 @@ public:
         return driver.GetPosition().GetValue();
     }
 
+    units::angle::turn_t get_angle_turns();
+
+    units::angle::degree_t get_angle_degrees();
+
     // No copies/moves should be occuring (Talons don't support this)
     SwerveModule(SwerveModule const &) = delete;
     SwerveModule(SwerveModule &&) = delete;
@@ -67,7 +71,7 @@ private:
 
     ctre::phoenix6::hardware::TalonFX driver, turner;
     ctre::phoenix6::hardware::CANcoder cancoder;
-    double const magnet_offset;
+    // double const magnet_offset;
     int turner_addr;
 };
 #endif

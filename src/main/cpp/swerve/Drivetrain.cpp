@@ -1,5 +1,4 @@
 #include "swerve/Drivetrain.h"
-
 #ifndef CFG_NO_DRIVEBASE
 /******************************************************************/
 /*                        Private Variables                       */
@@ -30,13 +29,10 @@ Drivetrain::Drivetrain()
 {
   // navx = std::make_unique<AHRS>(frc::SPI::Port::kMXP);
   using namespace Module;
-  front_left = std::make_unique<SwerveModule>(60, 61, 14, 79.277);
-  front_right = std::make_unique<SwerveModule>(50, 51, 13, 90 /*251.015*/);
-  // front_left = std::make_unique<SwerveModule>(60, 51, 14, 79.277);
-  // front_right = std::make_unique<SwerveModule>(50, 61, 13, 90 /*251.015*/);
-
-  back_left = std::make_unique<SwerveModule>(30, 31, 11, 90 /*-120.938*/);
-  back_right = std::make_unique<SwerveModule>(40, 41, 12, 0.9);
+  front_left = std::make_unique<SwerveModule>(60, 61, 14, -0.468_tr);
+  front_right = std::make_unique<SwerveModule>(50, 51, 13, 0.32_tr);
+  back_left = std::make_unique<SwerveModule>(30, 31, 11, -0.437_tr);
+  back_right = std::make_unique<SwerveModule>(40, 41, 12, 0.433_tr);
 }
 
 double Drivetrain::get_pitch()
@@ -77,7 +73,7 @@ void Drivetrain::print_angle()
     frc::SmartDashboard::PutNumber("fl/angle", front_left->getState().angle.Degrees().value());
     frc::SmartDashboard::PutNumber("fl/speed", front_left->getState().speed.value());
 
-    frc::SmartDashboard::PutNumber("fr/angle", front_right->getState().angle.Degrees().value());
+    frc::SmartDashboard::PutNumber("fr/angle", front_right->getAngle().value());
     frc::SmartDashboard::PutNumber("fr/speed", front_right->getState().speed.value());
 
     frc::SmartDashboard::PutNumber("br/angle", back_right->getState().angle.Degrees().value());
