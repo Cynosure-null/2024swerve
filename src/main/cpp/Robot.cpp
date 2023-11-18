@@ -70,7 +70,10 @@ void Robot::swerveDrive(bool const &field_relative)
   {
     m_container.m_drivetrain.zero_yaw();
   }
-  const units::meters_per_second_t left_right{frc::ApplyDeadband(m_container.m_driverController.GetLeftX(), 0.1) * 2 * TELEOP_MAX_SPEED};
+
+  frc::SmartDashboard::PutNumber("navx", m_container.m_drivetrain.getAngle().value());
+
+  const units::meters_per_second_t left_right{-frc::ApplyDeadband(m_container.m_driverController.GetLeftX(), 0.1) * 2 * TELEOP_MAX_SPEED};
   frc::SmartDashboard::PutNumber("desired lr translation", left_right.value());
   const units::meters_per_second_t front_back{frc::ApplyDeadband(m_container.m_driverController.GetLeftY(), 0.1) * 2 * TELEOP_MAX_SPEED};
   frc::SmartDashboard::PutNumber("desired fb translation", front_back.value());
