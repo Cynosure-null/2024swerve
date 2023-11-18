@@ -30,10 +30,12 @@ SwerveModule::SwerveModule(int const &driver_adr, int const &turner_adr, int con
     std::cout << "Cancoder pro msg: " << cancoder.GetIsProLicensed().IsAllGood();
     std::cout << "Swerve constuctor start for " << driver.GetDescription() << std::endl;
     turner_addr = turner_adr;
+
     configs::CANcoderConfiguration cancoder_config{};
     cancoder_config.MagnetSensor.AbsoluteSensorRange = signals::AbsoluteSensorRangeValue::Signed_PlusMinusHalf;
     cancoder_config.MagnetSensor.SensorDirection = signals::SensorDirectionValue::CounterClockwise_Positive;
     cancoder_config.MagnetSensor.MagnetOffset = offset.value();
+
     cancoder.GetConfigurator().Apply(cancoder_config);
 
     // Configure Driver    ctre::phoenix6::configs::t driver_config{};
@@ -41,13 +43,16 @@ SwerveModule::SwerveModule(int const &driver_adr, int const &turner_adr, int con
     driver_config.Audio.BeepOnBoot = true;
     driver_config.Audio.BeepOnConfig = true;
 
-    // driver_config.Slot0.kP = 0.04;
-    // driver_config.Slot0.kI = 0.002; I is bad, don't use
+    driver_config.Slot0.kP = 0.02;
+    // driver_config.Slot0.kD = 0.002;
+    // driver_config.Slot0.kI = 0.4;
+    // driver_config.Slot0.kV = 0.0097;
+    // driver_config.Slot0.kD = 0.002; // I is bad, don't use
     // driver_config.integralZone = 200;
-    // driver_config.Slot0.kD = 0.005;
-    // driver_config.Slot0.kS = 0.04857549857549857; // FIXME could be kG, kA or Kv
+    // driver_config.Slot0.kI = 0.400;
+    // driver_config.Slot0.kV = 0.0097; // FIXME could be kG, kA or Kv
     driver_config.CurrentLimits.StatorCurrentLimitEnable = true;
-    driver_config.CurrentLimits.StatorCurrentLimit = 70;
+    driver_config.CurrentLimits.StatorCurrentLimit = 420;
     driver_config.MotorOutput.NeutralMode.value = driver_config.MotorOutput.NeutralMode.Brake;
     //  TODO: TUNING
     driver_config.Feedback.RotorToSensorRatio = DRIVER_GEAR_RATIO; // FIXME
@@ -58,10 +63,11 @@ SwerveModule::SwerveModule(int const &driver_adr, int const &turner_adr, int con
 
     ctre::phoenix6::configs::TalonFXConfiguration turner_config{};
     turner_config.Audio.BeepOnBoot = true;
-    turner_config.Slot0.kP = 0;
-    turner_config.Slot0.kI = 0;
-    turner_config.Slot0.kD = -3;
+    turner_config.Slot0.kP = -3.203;
+    // turner_config.Slot0.kI = 32;
+    // turner_config.Slot0.kD = 0.08;
     turner_config.Slot0.kS = 0;
+    // turner_config.Slot0.
     turner_config.MotorOutput.PeakForwardDutyCycle = .5;
     turner_config.MotorOutput.PeakReverseDutyCycle = -.5;
     turner_config.ClosedLoopGeneral.ContinuousWrap = 1;
@@ -79,6 +85,7 @@ SwerveModule::SwerveModule(int const &driver_adr, int const &turner_adr, int con
     turner_config.Feedback.WithRemoteCANcoder(cancoder);
     turner_config.Feedback.SensorToMechanismRatio = 1;
     turner_config.Feedback.RotorToSensorRatio = TURNER_GEAR_RATIO;
+    turner_config.MotorOutput.NeutralMode = 1;
     // turner_config.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::RemoteCANcoder;
     turner.GetConfigurator().Apply(turner_config);
 }
@@ -118,18 +125,20 @@ void SwerveModule::setDesiredState(frc::SwerveModuleState const &desired_state)
     frc::Rotation2d const current_rotation = get_angle_degrees();
 
     // Optimize the reference state to avoid spinning further than 90 degrees
-    // auto const [optimized_speed, optimized_angle] = frc::SwerveModuleState::Optimize(desired_state, current_rotation);
-    auto const optimized_speed = desired_state.speed;
-    auto const optimized_angle = desired_state.angle;
+    auto const [optimized_speed, optimized_angle] = frc::SwerveModuleState::Optimize(desired_state, current_rotation);
+    // auto const optimized_speed = desired_state.speed;
+    // auto const optimized_angle = desired_state.angle;
     // Difference between desired angle and current angle
     // frc::Rotation2d delta_rotation = optimized_angle - current_rotation;
 
+    controls::PositionDutyCycle controlreq{optimized_angle.Degrees()};
+    controlreq.EnableFOC = 1;
     // Convert change in angle to change in (cancoder) ticks
     // double const delta_ticks = delta_rotation.Degrees().value() * TICKS_PER_CANCODER_DEGREE;
     frc::SmartDashboard::SmartDashboard::PutNumber(driver.GetDescription() + "/desired speed", optimized_speed.value());
     frc::SmartDashboard::SmartDashboard::PutNumber(driver.GetDescription() + "/desired angle", units::turn_t{optimized_angle.Degrees()}.value());
     driver.SetControl(controls::VelocityDutyCycle{bot_speed_to_wheel_speed(optimized_speed)});
-    turner.SetControl(controls::PositionDutyCycle{units::angle::turn_t{optimized_angle.Degrees()}});
+    turner.SetControl(controlreq);
     frc::SmartDashboard::PutNumber(driver.GetDescription() + "/cyclemarker", (double)std::rand() / RAND_MAX);
     frc::SmartDashboard::PutNumber(driver.GetDescription() + "/turner.get()", turner.GetPosition().Refresh().GetValueAsDouble());
     frc::SmartDashboard::PutNumber(driver.GetDescription() + "/getAngle().value()", getAngle().value());
@@ -143,7 +152,7 @@ void SwerveModule::setDesiredState(frc::SwerveModuleState const &desired_state)
 
 inline units::turns_per_second_t SwerveModule::bot_speed_to_wheel_speed(units::meters_per_second_t bot_speed)
 {
-    return units::turns_per_second_t{bot_speed.value() / WHEEL_CIRCUMFERENCE.value()};
+    return units::turns_per_second_t{(bot_speed.value() / WHEEL_CIRCUMFERENCE.value()) * DRIVER_GEAR_RATIO};
 }
 
 inline units::meters_per_second_t SwerveModule::wheel_speed_to_bot_speed(units::turns_per_second_t wheel_speed)

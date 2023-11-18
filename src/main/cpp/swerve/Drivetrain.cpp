@@ -30,9 +30,9 @@ Drivetrain::Drivetrain()
   // navx = std::make_unique<AHRS>(frc::SPI::Port::kMXP);
   using namespace Module;
   front_left = std::make_unique<SwerveModule>(60, 61, 14, -0.468_tr);
-  front_right = std::make_unique<SwerveModule>(50, 51, 13, 0.32_tr);
+  front_right = std::make_unique<SwerveModule>(50, 51, 13, -0.179_tr);
   back_left = std::make_unique<SwerveModule>(30, 31, 11, -0.437_tr);
-  back_right = std::make_unique<SwerveModule>(40, 41, 12, 0.433_tr);
+  back_right = std::make_unique<SwerveModule>(40, 41, 12, -0.0669_tr);
 }
 
 double Drivetrain::get_pitch()

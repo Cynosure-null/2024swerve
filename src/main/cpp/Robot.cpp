@@ -70,11 +70,11 @@ void Robot::swerveDrive(bool const &field_relative)
   {
     m_container.m_drivetrain.zero_yaw();
   }
-  const units::meters_per_second_t left_right{m_container.m_driverController.GetLeftX() * TELEOP_MAX_SPEED};
+  const units::meters_per_second_t left_right{frc::ApplyDeadband(m_container.m_driverController.GetLeftX(), 0.1) * 2 * TELEOP_MAX_SPEED};
   frc::SmartDashboard::PutNumber("desired lr translation", left_right.value());
-  const units::meters_per_second_t front_back{m_container.m_driverController.GetLeftY() * TELEOP_MAX_SPEED};
+  const units::meters_per_second_t front_back{frc::ApplyDeadband(m_container.m_driverController.GetLeftY(), 0.1) * 2 * TELEOP_MAX_SPEED};
   frc::SmartDashboard::PutNumber("desired fb translation", front_back.value());
-  auto const rot = m_container.m_driverController.GetRightX() * m_container.m_drivetrain.TELEOP_MAX_ANGULAR_SPEED;
+  auto const rot = frc::ApplyDeadband(m_container.m_driverController.GetRightX(), .1) * 2 * m_container.m_drivetrain.TELEOP_MAX_ANGULAR_SPEED;
   frc::SmartDashboard::PutNumber("desired rotation", rot.value());
   m_container.m_drivetrain.drive(front_back, -left_right, rot, field_relative);
 
@@ -85,7 +85,7 @@ void Robot::swerveDrive(bool const &field_relative)
 
 void Robot::TeleopPeriodic()
 {
-  swerveDrive();
+  swerveDrive(true);
 }
 
 /**
