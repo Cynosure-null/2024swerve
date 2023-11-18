@@ -33,5 +33,5 @@ private:
   std::optional<frc2::CommandPtr> m_autonomousCommand;
 
   RobotContainer m_container;
-  units::velocity::meters_per_second_t TELEOP_MAX_SPEED = m_container.m_drivetrain.ROBOT_MAX_SPEED;
+  units::velocity::meters_per_second_t TELEOP_MAX_SPEED = m_container.m_drivetrain.ROBOT_MAX_SPEED * 10;
 };

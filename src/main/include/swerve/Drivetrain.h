@@ -5,7 +5,6 @@
 #include "swerve/SwerveModule.h"
 #include "swerve/ngr.h"
 
-
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveModuleState.h>
 #include <frc/kinematics/SwerveModulePosition.h>
@@ -21,10 +20,9 @@
 #include <iostream>
 #include <fmt/format.h>
 
-
 class Drivetrain
 {
-    public:
+public:
     frc::BuiltInAccelerometer acc;
     Drivetrain();
 
@@ -34,7 +32,7 @@ class Drivetrain
     void zero_yaw();
 
     double get_pitch();
-    
+
     void print_angle();
 
     void debug_angles();
@@ -59,11 +57,11 @@ class Drivetrain
     // Distance of module from center is 1.294ft
 
     // Max effective linear speed
-    static constexpr units::meters_per_second_t ROBOT_MAX_SPEED =  14.533_fps;
-    static constexpr units::radians_per_second_t ROBOT_MAX_ANGULAR_SPEED{std::numbers::pi*1.25};
+    static constexpr units::meters_per_second_t ROBOT_MAX_SPEED = 14.533_fps;
+    static constexpr units::radians_per_second_t ROBOT_MAX_ANGULAR_SPEED{std::numbers::pi * 1.25};
 
     static constexpr units::meters_per_second_t TELEOP_MAX_SPEED = ROBOT_MAX_SPEED;
-    static constexpr units::radians_per_second_t TELEOP_MAX_ANGULAR_SPEED{std::numbers::pi*1.25};
+    static constexpr units::radians_per_second_t TELEOP_MAX_ANGULAR_SPEED{std::numbers::pi * 1.25};
     static constexpr units::meters_per_second_t TRAJ_MAX_SPEED = ROBOT_MAX_SPEED;
     static constexpr units::acceleration::meters_per_second_squared_t TRAJ_MAX_ACCELERATION = TRAJ_MAX_SPEED / 0.5_s;
     static constexpr units::radians_per_second_t TRAJ_MAX_ANGULAR_SPEED = ROBOT_MAX_ANGULAR_SPEED;
@@ -77,7 +75,6 @@ class Drivetrain
     void init();
     void zero_adjustment();
     double get_offset();
-
 
     // Returns values with 0 being front and positive angles going CW
     [[nodiscard]] units::degree_t getAngle();
@@ -103,7 +100,7 @@ class Drivetrain
     void tankDrive(double const &x_speed, double const &y_speed);
 
     /// @brief The entrypoint into driving in a normal swerve fasion.
-    /// Should be "closest to the user". 
+    /// Should be "closest to the user".
     /// Calls the ChassisSpeeds method
     /// @param xSpeed Desired horizontal speed (side to side)
     /// @param ySpeed Desired "vertical" speed (front to back)
@@ -118,7 +115,7 @@ class Drivetrain
     /// @param speeds The desired speeds the robot will move in
     void drive(frc::ChassisSpeeds const &speeds);
 
-    /// @brief The final step in the drive stack. 
+    /// @brief The final step in the drive stack.
     /// Moves each module to the required speed, given by the last step.
     /// @param states How fast should each module be moving and where.
     void drive(wpi::array<frc::SwerveModuleState, 4> states);
@@ -145,8 +142,8 @@ class Drivetrain
 
     void manualVelocity(double const &velocity_ticks_per_100ms);
 
-    private:
-    AHRS navx { frc::SPI::Port::kMXP };
+private:
+    AHRS navx{frc::SPI::Port::kMXP};
 };
 
 #endif

@@ -52,7 +52,8 @@ SwerveModule::SwerveModule(int const &driver_adr, int const &turner_adr, int con
     // driver_config.Slot0.kI = 0.400;
     // driver_config.Slot0.kV = 0.0097; // FIXME could be kG, kA or Kv
     driver_config.CurrentLimits.StatorCurrentLimitEnable = true;
-    driver_config.CurrentLimits.StatorCurrentLimit = 420;
+    driver_config.CurrentLimits.StatorCurrentLimit = 700;
+    // driver_config.CurrentLimits.SupplyCurrentLimitEnable
     driver_config.MotorOutput.NeutralMode.value = driver_config.MotorOutput.NeutralMode.Brake;
     //  TODO: TUNING
     driver_config.Feedback.RotorToSensorRatio = DRIVER_GEAR_RATIO; // FIXME
@@ -139,6 +140,7 @@ void SwerveModule::setDesiredState(frc::SwerveModuleState const &desired_state)
     frc::SmartDashboard::SmartDashboard::PutNumber(driver.GetDescription() + "/desired angle", units::turn_t{optimized_angle.Degrees()}.value());
     driver.SetControl(controls::VelocityDutyCycle{bot_speed_to_wheel_speed(optimized_speed)});
     turner.SetControl(controlreq);
+    frc::SmartDashboard::PutNumber(driver.GetDescription() + "/vout", driver.GetMotorVoltage().GetValueAsDouble());
     frc::SmartDashboard::PutNumber(driver.GetDescription() + "/cyclemarker", (double)std::rand() / RAND_MAX);
     frc::SmartDashboard::PutNumber(driver.GetDescription() + "/turner.get()", turner.GetPosition().Refresh().GetValueAsDouble());
     frc::SmartDashboard::PutNumber(driver.GetDescription() + "/getAngle().value()", getAngle().value());
