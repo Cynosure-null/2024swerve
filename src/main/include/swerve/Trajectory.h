@@ -31,15 +31,14 @@ using namespace pathplanner; // PathPlanner keeps everything hidden behind 2 set
 
 class Trajectory : public frc2::SubsystemBase
 {
-    public:
+public:
     Trajectory(
-        Drivetrain* drivetrain,
-        Odometry* odometry
-    );
+        Drivetrain *drivetrain,
+        Odometry *odometry);
 
     // Note: a 2023 comment means it is Moonwalker Specific and can be safely removed.
 
-    //2023
+    // 2023
     struct TrajDepends
     {
         units::meter_t current_x;
@@ -51,71 +50,79 @@ class Trajectory : public frc2::SubsystemBase
         units::degree_t desired_head;
         units::degree_t desired_rot;
     };
-/*
-    TrajDepends fall_back(units::meter_t fallback_pos = 1.0_m);
+    const PathConstraints DEFAULT_CONSTRAINTS = PathConstraints(14_fps, 7_fps_sq, 360_deg_per_s, 720_deg_per_s_sq);
+    // constexpr PathConstraints DEFAULT_CONSTRAINTS = PathConstraints(CONSTANTS:)
 
-    PathPlannerPath generate_live_traj(TrajDepends t);
+    frc2::CommandPtr make_absolute_line_path(frc::Pose2d target_pose);
 
-    PathPlannerTrajectory generate_live_traj(units::meter_t current_x,
-                                             units::meter_t current_y,
-                                             frc::Rotation2d current_head,
-                                             frc::Rotation2d current_rot,
-                                             units::meter_t desired_x,
-                                             units::meter_t desired_y,
-                                             frc::Rotation2d desired_head,
-                                             frc::Rotation2d desired_rot
-                                             );
+    frc2::CommandPtr make_relative_line_path(units::meter_t x, units::meter_t y, frc::Rotation2d rot);
 
-    PathPlannerTrajectory generate_live_traj(units::meter_t current_x,
-                                             units::meter_t current_y,
-                                             units::degree_t current_head,
-                                             units::degree_t current_rot,
-                                             units::meter_t desired_x,
-                                             units::meter_t desired_y,
-                                             units::degree_t desired_head,
-                                             units::degree_t desired_rot
-                                             );
+    frc2::CommandPtr extract();
+    /*
+        TrajDepends fall_back(units::meter_t fallback_pos = 1.0_m);
 
-    /// @brief Must be called a cycle before a trajectory is followed. Should only be called once, not periodicly.
-    /// @param traj The trajectory to be followed. Does not affect the trajectory.
-    /// @param offset The time offset for when the trajectory should start. 
-    void init_live_traj(PathPlannerTrajectory traj, units::second_t offset = 0.0_s);
+        PathPlannerPath generate_live_traj(TrajDepends t);
 
-    /// @brief Makes the robot start follwing a trajectory. Must be called every cycle.
-    /// @param traj The trajectory to follow
-    /// @return True if the path is complete, false if it in progress.
-    bool follow_live_traj(PathPlannerTrajectory traj);
+        PathPlannerTrajectory generate_live_traj(units::meter_t current_x,
+                                                 units::meter_t current_y,
+                                                 frc::Rotation2d current_head,
+                                                 frc::Rotation2d current_rot,
+                                                 units::meter_t desired_x,
+                                                 units::meter_t desired_y,
+                                                 frc::Rotation2d desired_head,
+                                                 frc::Rotation2d desired_rot
+                                                 );
 
-    /// @brief Converts a file into a live trajectory 
-    PathPlannerPath extract(std::string const &traj_dir,
-                                units::meters_per_second_t const &max_vel = Drivetrain::TRAJ_MAX_SPEED,
-                                units::meters_per_second_squared_t const &max_accl = Drivetrain::TRAJ_MAX_ACCELERATION);
+        PathPlannerTrajectory generate_live_traj(units::meter_t current_x,
+                                                 units::meter_t current_y,
+                                                 units::degree_t current_head,
+                                                 units::degree_t current_rot,
+                                                 units::meter_t desired_x,
+                                                 units::meter_t desired_y,
+                                                 units::degree_t desired_head,
+                                                 units::degree_t desired_rot
+                                                 );
 
-    void printRobotRelativeSpeeds();
+        /// @brief Must be called a cycle before a trajectory is followed. Should only be called once, not periodicly.
+        /// @param traj The trajectory to be followed. Does not affect the trajectory.
+        /// @param offset The time offset for when the trajectory should start.
+        void init_live_traj(PathPlannerTrajectory traj, units::second_t offset = 0.0_s);
 
-    void printFieldRelativeSpeeds();
+        /// @brief Makes the robot start follwing a trajectory. Must be called every cycle.
+        /// @param traj The trajectory to follow
+        /// @return True if the path is complete, false if it in progress.
+        bool follow_live_traj(PathPlannerTrajectory traj);
 
-    void driveToState(PathPlannerTrajectory::State const &state);
+        /// @brief Converts a file into a live trajectory
+        PathPlannerPath extract(std::string const &traj_dir,
+                                    units::meters_per_second_t const &max_vel = Drivetrain::TRAJ_MAX_SPEED,
+                                    units::meters_per_second_squared_t const &max_accl = Drivetrain::TRAJ_MAX_ACCELERATION);
 
-    /// @brief The legacy way of following a path. Interupts the thread until the path is finished
-    /// @param traj_dir The file to load the trajectory. 
-    /// Only looks in src/main/deploy/pathplanner and .path should be ommited
+        void printRobotRelativeSpeeds();
 
+        void printFieldRelativeSpeeds();
 
-    void follow(std::string const &traj_dir,
-                std::function<void(units::second_t time)> const &periodic = nullptr,
-                units::meters_per_second_t const &max_vel = Drivetrain::TRAJ_MAX_SPEED,
-                units::meters_per_second_squared_t const &max_accl = Drivetrain::TRAJ_MAX_ACCELERATION);
+        void driveToState(PathPlannerTrajectory::State const &state);
 
-    void testHolonomic(frc::Pose2d const &target_pose,
-                       units::velocity::meters_per_second_t const &velocity,
-                       frc::Rotation2d const &target_rot);
+        /// @brief The legacy way of following a path. Interupts the thread until the path is finished
+        /// @param traj_dir The file to load the trajectory.
+        /// Only looks in src/main/deploy/pathplanner and .path should be ommited
 
 
-    bool reverse_trajectory = false;
-*/
-    private:
-    Drivetrain* m_drivetrain;
-    Odometry* m_odometry;
+        void follow(std::string const &traj_dir,
+                    std::function<void(units::second_t time)> const &periodic = nullptr,
+                    units::meters_per_second_t const &max_vel = Drivetrain::TRAJ_MAX_SPEED,
+                    units::meters_per_second_squared_t const &max_accl = Drivetrain::TRAJ_MAX_ACCELERATION);
+
+        void testHolonomic(frc::Pose2d const &target_pose,
+                           units::velocity::meters_per_second_t const &velocity,
+                           frc::Rotation2d const &target_rot);
+
+
+        bool reverse_trajectory = false;
+    */
+private:
+    Drivetrain *m_drivetrain;
+    Odometry *m_odometry;
 };
 #endif
